@@ -196,6 +196,7 @@ class fetch(Command):
         ("missing-checksum-ok", None, "Continue on a missing checksum (default abort)"),
         ("sqlite", None, "Download SQLite amalgamation"),
         ("all", None, "Download all downloadable components"),
+        ("sqlite-options=", None, "Options passed to sqlite ./configure (default none)")
         ]
     fetch_options=['sqlite']
     boolean_options=fetch_options+['all', 'missing-checksum-ok']
@@ -205,6 +206,7 @@ class fetch(Command):
         self.sqlite=False
         self.all=False
         self.missing_checksum_ok=False
+        self.sqlite_options=None
 
     def finalize_options(self):
         # If all is selected then turn on all components
@@ -339,7 +341,7 @@ class fetch(Command):
                         open("sqlite3config.h", "wb").write(sqlite3config_h)
                 else:
                     write("    Running configure to work out SQLite compilation flags")
-                    res=os.system("./configure >/dev/null")
+                    res=os.system("./configure %s >/dev/null" % (self.sqlite_options or "",))
                     defline=None
                     for line in read_whole_file("Makefile", "rtU").split("\n"):
                         if line.startswith("DEFS = "):
